@@ -36,7 +36,7 @@ ui <- fluidPage(
     
     br(),
     actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
-                 onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/sample-size-for-RCT-endpoint-of-log-normally-distributed-biomarker-/master/power/app.R', '_blank')"),   
+                 onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/lognormal-biomarker-analysis/master/RCT-lognormal-biomarker-analysis/app.R', '_blank')"),   
     actionButton("resample", "Simulate a new sample"),
     br(), br(),
     tags$a(href = "https://en.wikipedia.org/wiki/Log-normal_distribution", "Read more about the log-normal distribution."),
