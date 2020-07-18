@@ -1,6 +1,7 @@
 library(shiny)
 library(RColorBrewer)
 library(shinythemes)
+library(shinyWidgets)
 require(MethylCapSig)  # generate log normal correlated vars
 #Frank Harrell package 
 require(rms)
@@ -21,6 +22,11 @@ p0 <- function(x) {formatC(x, format="f", digits=0)}
 
 ui <- fluidPage(
     
+  setBackgroundColor(
+    color = c( "#2171B5", "#F7FBFF"), 
+    gradient = "linear",
+    direction = "top"
+  ),
     # App title ----
     titlePanel("The analysis of an RCT based on a continuous endpoint that is log-normal distributed"),
     
@@ -35,22 +41,67 @@ ui <- fluidPage(
     
     
     br(),
+  
+    actionButton(inputId='ab1', label="RShiny code",   icon = icon("th"), 
+               onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/lognormal-biomarker-analysis/master/RCT-lognormal-biomarker-analysis/app.R', '_blank')"),   
+
     actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
                  onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/lognormal-biomarker-analysis/master/RCT-lognormal-biomarker-analysis/app.R', '_blank')"),   
-    actionButton("resample", "Simulate a new sample"),
+    
+    actionButton("resample", "Hit to simulate a new sample"),
     br(), br(),
     tags$a(href = "https://en.wikipedia.org/wiki/Log-normal_distribution", "Read more about the log-normal distribution."),
     
   
+  #######################################################################
+ # br(),
+  # actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
+  #              onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/sample-size-for-RCT-endpoint-of-log-normally-distributed-biomarker-/master/power/app.R', '_blank')"),   
+  # actionButton("resample", "Simulate a new sample"),
+  # br(),
+  
+  
+  tags$style(type="text/css", ".span8 .well { background-color: #00BFFF; }"),
+  
+  
+  # actionButton(inputId='ab1', label="Rshiny code",   icon = icon("th"),   
+  #              onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/sample-size-for-RCT-endpoint-of-log-normally-distributed-biomarker-/master/power/app.R', '_blank')"),   
+  # actionButton("resample", "Hit to simulate a new sample"),
+  # br(),  
+  tags$style(".well {background-color:#A9A9A9 ;}"), ##ABB0B4AF
+  
+  tags$head(
+    tags$style(HTML('#ab1{background-color:orange}'))
+  ),
+  
+  tags$head(
+    tags$style(HTML('#resample{background-color:orange}'))
+  ),
+  
+  #######################################################################
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
     
+  #  br(),
     br(),
-    br(),
-    p(strong("Generate true population parameters:")),
+    #p(strong("Generate true population parameters:")),
     sidebarLayout(
         
         # Sidebar panel for inputs ----
         sidebarPanel(
-            
+          p(strong("Generate true population parameters:")),
           div(p("Select the number of patients randomised 1:1 to each treatment, the correlation between the outcome measure and baseline version, log-normal means and the log-normal SDs, the treatment effect is the ratio of the changes in the two treatment arms.")),
          
             br(),
@@ -97,16 +148,18 @@ ui <- fluidPage(
                         
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         
-                        tabPanel("Distributions of the outcome measure", value=4, h3("Before and after log transformation, showing baseline and outcome data, by treatment group."),
+                        tabPanel( div(h5(tags$span(style="color:black", "Distributions of the outcome measure"))),
+                                 value=4, h3("Before and after log transformation, showing baseline and outcome data, by treatment group."),
                                  plotOutput("plot4"),
                                  h5("The top two plots show the untransformed values. Here we are looking for a proportional change, this is hard to see. The bottom two plots show the same data log transformed. The difference is now easier to see and the data more normally distributed. Note with regard to the 2nd panel from the top, the y-axis may change considerably compared to the top panel, and so the same distribution can look radically different, but it is just the scale.")
-                              , br(),
+                              , #, br(),
                               verbatimTextOutput("summary2")
                         ),
                         
                         
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        tabPanel("Scatter plot", value=5, h3("A plot of the log transformed data"),
+                        tabPanel( div(h5(tags$span(style="color:black", "Scatter plot"))),
+                           h3("A plot of the log transformed data"),
                                  p('A plot of the individual data points, by treatment group with pre-post datapoints for each patient joined by a faint line. Random uniform noise (jitter) added horizontally to aid visualisation.'
                                    ,'On the left, the biege points, are the patients randomised to treatment A, On the right, the blue points, patients randomised to treatment B.
                           We show the crude means plus minus 2 SEs. The treatment effect estimate will be the difference of the within arm differences adjusting for the baseline. As we are analysing on the log scale the estimates may be exponentiated to present a proportional change.
@@ -118,8 +171,8 @@ ui <- fluidPage(
                         ),
                         
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        
-                        tabPanel("Treatment effect", value=5, h3("Estimate the treatment effect using ANCOVA model"),
+                        tabPanel( div(h5(tags$span(style="color:black", "Treatment effect"))),
+                          h3("Estimate the treatment effect using ANCOVA model"),
                                  p('This is the result of interest, the difference on the log scale with 95% confidence.'), 
                                  verbatimTextOutput("summary") ,
                                  p('The log scale is not very intuitive so we back transform and present below. This is the result of interest, on the more relevant original scale, the proportional change adjusted for baseline with 95% confidence (this is the ratio of adjusted geometric means (B/A))'), 
@@ -128,8 +181,8 @@ ui <- fluidPage(
                                  verbatimTextOutput("summary999") 
                         ),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        
-                        tabPanel("Adjusted means", value=5, h3("Estimate the adjusted means from ANCOVA model"),
+                         tabPanel( div(h5(tags$span(style="color:black", "Adjusted means"))),
+                        h3("Estimate the adjusted means from ANCOVA model"),
                                  #p('The model we fit is an ', strong('ANCOVA') ), 
                                  #br(),
                                  tags$a(href = "https://www.ncbi.nlm.nih.gov/pubmed/16921578", "Further information on ANCOVA."),
@@ -146,8 +199,8 @@ ui <- fluidPage(
                                  verbatimTextOutput("muB")
                         ),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        
-                        tabPanel("ANCOVA and plot", value=3, 
+                        tabPanel( div(h5(tags$span(style="color:black", "ANCOVA and plot"))),
+                       
                                  h3("Analysis of covariance"),
                                  p('Perform analysis of covariance. The difference between the parallel lines is a measure of the treatment effect.'),
                                  plotOutput("plot2"),
@@ -156,14 +209,16 @@ ui <- fluidPage(
                                 
                                  ),   
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        
-                        tabPanel("Model assumption check", value=3, h3("Assess normality of the residuals"),
+                        tabPanel( div(h5(tags$span(style="color:black", "Model assumption check"))),
+                                  
+                          h3("Assess normality of the residuals"),
                                  p('Look left at the distribution of the residuals and assess normality assumption.'),
                                  br(), plotOutput("plot3"),  h5("The model residual estimate is printed below (on the log transformed scale)..... useful to power a follow up study."),
                                  # ),
                                  tableOutput("table")),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        tabPanel("Power for a t-test", value=5, h3("Sample Size for a two-sample t-test"),
+                        tabPanel( div(h5(tags$span(style="color:black", "Power for a t-test"))),
+                        h3("Sample Size for a two-sample t-test"),
                                  p('The goal of this analysis is to estimate the power for a test intended to
                       determine if there is a difference in the outcome of interest. The computations are based on a ',strong('t-test') ,' for two independent 
                       countinuous populations and are performed for a two-sided hypothesis test. This is a suboptimal way of powering this tudy design as we are ignoring baseline information and correlation, only focussing on follow up.'),
