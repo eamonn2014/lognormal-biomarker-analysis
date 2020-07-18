@@ -148,7 +148,7 @@ ui <- fluidPage(
                         
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         
-                        tabPanel( div(h5(tags$span(style="color:black", "Distributions of the outcome measure"))),
+                        tabPanel( div(h4(tags$span(style="color:black", "Distributions of outcome measure"))),
                                  value=4, h3("Before and after log transformation, showing baseline and outcome data, by treatment group."),
                                  plotOutput("plot4"),
                                  h5("The top two plots show the untransformed values. Here we are looking for a proportional change, this is hard to see. The bottom two plots show the same data log transformed. The difference is now easier to see and the data more normally distributed. Note with regard to the 2nd panel from the top, the y-axis may change considerably compared to the top panel, and so the same distribution can look radically different, but it is just the scale.")
@@ -158,7 +158,7 @@ ui <- fluidPage(
                         
                         
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        tabPanel( div(h5(tags$span(style="color:black", "Scatter plot"))),
+                        tabPanel( div(h4(tags$span(style="color:black", "Scatter plot"))),
                            h3("A plot of the log transformed data"),
                                  p('A plot of the individual data points, by treatment group with pre-post datapoints for each patient joined by a faint line. Random uniform noise (jitter) added horizontally to aid visualisation.'
                                    ,'On the left, the biege points, are the patients randomised to treatment A, On the right, the blue points, patients randomised to treatment B.
@@ -171,7 +171,7 @@ ui <- fluidPage(
                         ),
                         
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        tabPanel( div(h5(tags$span(style="color:black", "Treatment effect"))),
+                        tabPanel( div(h4(tags$span(style="color:black", "Treatment effect"))),
                           h3("Estimate the treatment effect using ANCOVA model"),
                                  p('This is the result of interest, the difference on the log scale with 95% confidence.'), 
                                  verbatimTextOutput("summary") ,
@@ -181,7 +181,7 @@ ui <- fluidPage(
                                  verbatimTextOutput("summary999") 
                         ),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                         tabPanel( div(h5(tags$span(style="color:black", "Adjusted means"))),
+                         tabPanel( div(h4(tags$span(style="color:black", "Adjusted means"))),
                         h3("Estimate the adjusted means from ANCOVA model"),
                                  #p('The model we fit is an ', strong('ANCOVA') ), 
                                  #br(),
@@ -199,7 +199,7 @@ ui <- fluidPage(
                                  verbatimTextOutput("muB")
                         ),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        tabPanel( div(h5(tags$span(style="color:black", "ANCOVA and plot"))),
+                        tabPanel( div(h4(tags$span(style="color:black", "ANCOVA"))),
                        
                                  h3("Analysis of covariance"),
                                  p('Perform analysis of covariance. The difference between the parallel lines is a measure of the treatment effect.'),
@@ -209,7 +209,7 @@ ui <- fluidPage(
                                 
                                  ),   
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        tabPanel( div(h5(tags$span(style="color:black", "Model assumption check"))),
+                        tabPanel( div(h4(tags$span(style="color:black", "Assumption check"))),
                                   
                           h3("Assess normality of the residuals"),
                                  p('Look left at the distribution of the residuals and assess normality assumption.'),
@@ -217,7 +217,7 @@ ui <- fluidPage(
                                  # ),
                                  tableOutput("table")),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        tabPanel( div(h5(tags$span(style="color:black", "Power for a t-test"))),
+                        tabPanel( div(h4(tags$span(style="color:black", "Power t-test"))),
                         h3("Sample Size for a two-sample t-test"),
                                  p('The goal of this analysis is to estimate the power for a test intended to
                       determine if there is a difference in the outcome of interest. The computations are based on a ',strong('t-test') ,' for two independent 
