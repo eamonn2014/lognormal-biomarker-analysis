@@ -46,7 +46,7 @@ ui <- fluidPage(
                onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/lognormal-biomarker-analysis/master/RCT-lognormal-biomarker-analysis/app.R', '_blank')"),   
 
     actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
-                 onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/lognormal-biomarker-analysis/master/RCT-lognormal-biomarker-analysis/app.R', '_blank')"),   
+                 onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/lognormal-biomarker-analysis/master/RCT-lognormal-biomarker-analysis/Rcode.R', '_blank')"),   
     
     actionButton("resample", "Hit to simulate a new sample"),
     br(), br(),
