@@ -18,7 +18,8 @@ p2 <- function(x) {formatC(x, format="f", digits=2)}
 p1 <- function(x) {print(formatC(x, format="f", digits=1),quote=FALSE)}
 p1 <- function(x) {formatC(x, format="f", digits=1)}
 p0 <- function(x) {formatC(x, format="f", digits=0)}
-
+options(scipen = 999)     
+options(dplyr.summarise.inform=F) 
 
 ui <- fluidPage(
     
@@ -79,21 +80,7 @@ ui <- fluidPage(
   ),
   
   #######################################################################
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-    
+   
   #  br(),
     br(),
     #p(strong("Generate true population parameters:")),
@@ -153,7 +140,12 @@ ui <- fluidPage(
                                  plotOutput("plot4"),
                                  h5("The top two plots show the untransformed values. Here we are looking for a proportional change, this is hard to see. The bottom two plots show the same data log transformed. The difference is now easier to see and the data more normally distributed. Note with regard to the 2nd panel from the top, the y-axis may change considerably compared to the top panel, and so the same distribution can look radically different, but it is just the scale.")
                               , #, br(),
-                              verbatimTextOutput("summary2")
+                              verbatimTextOutput("summary2"),
+                              
+                              h5("Summary statistics, untransformed data"),
+                              verbatimTextOutput("sum_stat"),
+                              h5("Summary statistics, log transformed data"),
+                              verbatimTextOutput("sum_stat2")
                         ),
                         
                         
@@ -314,11 +306,13 @@ server <- shinyServer(function(input, output) {
     sd1 <- input$sd1
     sd2 <- input$sd2
     r <-   input$r
+    grp1 <-   input$grp1
+    grp2 <-   input$grp2
     
     z0 <- mvlognormal(n = n, Mu = c( mu1, mu2),  # learn what this function does
                      Sigma = c( sd1^2,  sd2^2), R = toeplitz( r^(0:1))); # toepliz 
     
-    return(list(z=z0))
+    return(list(z=z0 , n=n,mu1=mu1,mu2=mu2,sd1=sd1,sd2=sd2,r=r, grp1=grp1, grp2=grp2))
   })
   
    
@@ -329,13 +323,10 @@ server <- shinyServer(function(input, output) {
       sample <- random.sample()
         # Given mean (Mu), variances (Sigma) and correlation structure (R) of the distribution, mvlognormal
         # generates multivariate lognormal random variables.
-        z <- mvlognormal(n = input$d, Mu = c(input$mu1,input$mu2),  # learn what this function does
-                         Sigma = c(input$sd1^2, input$sd2^2), R = toeplitz(input$r^(0:1))); # toepliz 
-        
-        
-        
-        
-        
+        z <- mvlognormal(n = sample$n, Mu = c(sample$mu1,sample$mu2),  # learn what this function does
+                         Sigma = c(sample$sd1^2, sample$sd2^2), 
+                         R = toeplitz(sample$r^(0:1))); # toepliz 
+  
         z <- as.data.frame(z)
         
         # nice plot
@@ -343,9 +334,9 @@ server <- shinyServer(function(input, output) {
        
         z$trt <- 1*(runif(nrow(z))>.5)
         
-        prop.change <- input$grp1/input$grp2 # true prop change
+        prop.change <- sample$grp1/sample$grp2 # true prop change
         
-        z$x2 <- ifelse(z$trt %in% 1, z$V2*input$grp1, z$V2*input$grp2)  # allow an effect in both arms. 0.7/.875 = .8
+        z$x2 <- ifelse(z$trt %in% 1, z$V2*sample$grp1, z$V2*sample$grp2)  # allow an effect in both arms. 0.7/.875 = .8
         
         z$trt <- ifelse(z$trt %in% 1, "A", "B")    
  
@@ -354,7 +345,43 @@ server <- shinyServer(function(input, output) {
         names(z) <- c("BASE","TRTP","AVAL")
 
         logged <- foo2 <- z
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        L <- z %>% gather("BASE", "AVAL", -c(TRTP))
+        # summary stats
+        require(dplyr)
         
+          df_sumstat <- L %>% # the names of the new data frame and the data frame to be summarised
+          group_by( BASE, TRTP) %>%                      # the grouping variable
+          summarise( Ns=length(TRTP),                    
+                     mean_PL = mean(AVAL, na.rm=TRUE),   # calculates the mean of each group
+                     SE_PL = sd(AVAL, na.rm=TRUE)/sqrt(length(na.omit(AVAL))), # SE of each group
+                     sd_PL = sd(AVAL, na.rm=TRUE),       # calculates the sd of each group
+                     min = min(AVAL, na.rm=T),
+                     median=median(AVAL, na.rm=T) ,
+                     max = max(AVAL, na.rm=T) ,
+                     miss = sum(is.na(AVAL)) 
+          )
+          df_sumstat <- as.data.frame(df_sumstat)
+         
+          names(df_sumstat) <- c("Timepoint","Trt","N","Mean","SE","SD","Minimum","Median","Maximum","Missing")
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+          L$AVAL <- log(L$AVAL)
+          df_sumstat2 <- L %>% # the names of the new data frame and the data frame to be summarised
+            group_by( BASE, TRTP) %>%                      # the grouping variable
+            summarise( Ns=length(TRTP),                    
+                       mean_PL = mean(AVAL, na.rm=TRUE),   # calculates the mean of each group
+                       SE_PL = sd(AVAL, na.rm=TRUE)/sqrt(length(na.omit(AVAL))), # SE of each group
+                       sd_PL = sd(AVAL, na.rm=TRUE),       # calculates the sd of each group
+                       min = min(AVAL, na.rm=T),
+                       median=median(AVAL, na.rm=T) ,
+                       max = max(AVAL, na.rm=T) ,
+                       miss = sum(is.na(AVAL)) 
+            )
+          df_sumstat2 <- as.data.frame(df_sumstat2)
+          
+          names(df_sumstat2) <- c("Timepoint","Trt","N","Mean","SE","SD","Minimum","Median","Maximum","Missing")
+          #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+          
         # log the values
         foo2$AVAL <- log(foo2$AVAL)
         foo2$BASE <- log(foo2$BASE)
@@ -364,7 +391,8 @@ server <- shinyServer(function(input, output) {
         foo2$PCHG <- ((foo2$AVAL-foo2$BASE)/foo2$BASE)*100  # % change from baseline not used
          
         
-        return(list(z = z, foo2 = foo2 , prop.change = prop.change, x1=x1, logged=logged , grp1= input$grp1 , grp2= input$grp2))
+        return(list(z = z, foo2 = foo2 , prop.change = prop.change, x1=x1, logged=logged ,
+                    grp1= sample$grp1 , grp2= sample$grp2, df_sumstat=df_sumstat, df_sumstat2 =df_sumstat2 ))
         
     }) 
     
@@ -677,10 +705,11 @@ server <- shinyServer(function(input, output) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     power <- reactive({
        
+      sample <- random.sample()
         # see my previous app https://raw.githubusercontent.com/eamonn2014/sample-size-for-RCT-endpoint-of-log-normally-distributed-biomarker-/master/power/app.R
         # convert lognormal <-> normal
-        v <- input$sd1^2
-        m <- input$mu1
+        v <- sample$sd1^2
+        m <- sample$mu1
         
         phi = sqrt(v + m^2);
         mu    = log(m^2/phi)           # mean of log(Y)      
@@ -690,9 +719,9 @@ server <- shinyServer(function(input, output) {
       
       sd <- sigma
       
-      prop.change <- input$grp1/input$grp2 # true prop change
+      prop.change <- sample$grp1/sample$grp2 # true prop change
       
-      Po <- power.t.test(n= input$d/2, delta =log(prop.change), sd=sd, sig.level=0.05,
+      Po <- power.t.test(n= sample$n/2, delta =log(prop.change), sd=sd, sig.level=0.05,
                         power=NULL, type="two.sample", alternative=c("two.sided"))
       
       
@@ -853,6 +882,17 @@ server <- shinyServer(function(input, output) {
      output$power <- renderPrint({
        power()$P
      })
+     
+     
+     output$sum_stat <- renderPrint({
+        print(logN.2.Norm()$df_sumstat, digits=0) 
+     })
+     
+     output$sum_stat2 <- renderPrint({
+       print(logN.2.Norm()$df_sumstat2, digits=2) 
+     })
+     
+
 })
 
  
