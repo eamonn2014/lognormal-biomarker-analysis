@@ -5,7 +5,7 @@ library(shinyWidgets)
 require(MethylCapSig)  # generate log normal correlated vars
 #Frank Harrell package 
 require(rms)
-
+require(tidyverse)
 
 fig.width <- 900
 fig.height <- 950
@@ -471,7 +471,6 @@ server <- shinyServer(function(input, output) {
     
     # --------------------------------------------------------------------------
     
-    
     # Dummy line to trigger off button-press
     
     simulate <- reactive({
@@ -480,9 +479,7 @@ server <- shinyServer(function(input, output) {
         
       
     }) 
-    
-   
-    
+
     #---------------------------------------------------------------------------
     # Plot a scatter plot of the data, joining patient data
     output$plot <- renderPlot({         
@@ -714,8 +711,7 @@ server <- shinyServer(function(input, output) {
         phi = sqrt(v + m^2);
         mu    = log(m^2/phi)           # mean of log(Y)      
         sigma = sqrt(log(phi^2/m^2))   # std dev of log(Y)  
-        
-    
+     
       
       sd <- sigma
       
@@ -726,8 +722,7 @@ server <- shinyServer(function(input, output) {
       
       
       return(list(P=Po, power=Po$power))
-      
-      
+       
       # sd=0.83, delta=log(0.75) 80% power requires total N=132 completers
       # sd=0.85, delta=log(0.80) 85% power requires total N=524 completors
       # sd=0.85, delta=log(0.82) 85% power requires total N=662 completors
