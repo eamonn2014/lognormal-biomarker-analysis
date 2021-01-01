@@ -865,20 +865,13 @@ server <- shinyServer(function(input, output) {
       word2 <- ifelse(B.DIFF > 0 , "higher","lower")
   
       
-<<<<<<< HEAD
+ 
       cat(paste0("On the log scale, on average, the patients treated in arm B were ", p3(abs(Y.DIFF)),  " units ",word, " than the patients under treatment A, \nthat is y mean = ", 
                  p3(B.AVAL)," under treatment B and y mean = ", p3(A.AVAL), " for treatment A."))
       
       cat(paste0("\nBut the two groups differed in their pre treatment version of the predictor, the patients treated in arm B were ", 
                  p3(abs(B.DIFF)),  " units ",word2, " \nthan the patients under treatment A, that is y mean = ", p3(B.BASE)," under treatment B and y mean = ", p3(A.BASE), " for treatment A."))
-=======
-      cat(paste0("On the log scale, on average, the patients treated in arm B were ", p3(abs(Y.DIFF)),  " units ",word, " than the patients under treatment A, \nthat is y= ", 
-                 p3(B.AVAL)," under treatment B and y= ", p3(A.AVAL), " for treatment A."))
-      
-      cat(paste0("\nBut the two groups differed in their pre treatment version of the predictor, the patients treated in arm B were ", 
-                 p3(abs(B.DIFF)),  " units ",word2, " \nthan the patients under treatment A, that is y= ", p3(B.BASE)," under treatment B and y= ", p3(A.BASE), " for treatment A."))
->>>>>>> 4d696de8f8b257100c91f17163057f7635ec6e7d
-      
+ 
       cat(paste0("\nAfter adjusting for this difference we obtained an estimated treatment effect B-A of ", p3(trt.effx[1] [[1]])," units."))  
       
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
