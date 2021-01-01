@@ -874,6 +874,9 @@ server <- shinyServer(function(input, output) {
  
       cat(paste0("\nAfter adjusting for this difference we obtained an estimated treatment effect B-A of ", p3(trt.effx[1] [[1]])," units."))  
       
+      
+      cat(paste0("\nAlways adjust for strong baseline prognostic factors, explain easily explainable outcome variation using ANCOVA, and never use change from baseline."))
+      
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ### on the un transformed scale
       
