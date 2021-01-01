@@ -166,7 +166,7 @@ ui <- fluidPage(
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         tabPanel( div(h4(tags$span(style="color:black", "Treatment effect"))),
                           h3("Estimate the treatment effect using ANCOVA model"),
-                                 p('This is the result of interest, the difference on the log scale with 95% confidence.'), 
+                                 p('This is the result of interest, the difference B-A on the log scale with 95% confidence.'), 
                                  verbatimTextOutput("summary") ,
                                  p('The log scale is not very intuitive so we back transform and present below. This is the result of interest, on the more relevant original scale, the proportional change adjusted for baseline with 95% confidence (this is the ratio of adjusted geometric means (B/A))'), 
                                  verbatimTextOutput("summary99") ,
