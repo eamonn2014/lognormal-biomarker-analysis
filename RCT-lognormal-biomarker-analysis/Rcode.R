@@ -61,6 +61,78 @@ p0 <- function(x) {formatC(x, format="f", digits=0)}
     
     logged <- foo2 <- z
     
+    
+    L <- z %>% gather("BASE", "AVAL", -c(TRTP))
+    
+    
+    require(dplyr)
+        
+    
+    
+    df_sum <- L %>% # the names of the new data frame and the data frame to be summarised
+      group_by( BASE, TRTP) %>%                      # the grouping variable
+      summarise( Ns=length(TRTP),              # unique subjects
+                 mean_PL = mean(AVAL, na.rm=TRUE),   # calculates the mean of each group
+                 sd_PL = sd(AVAL, na.rm=TRUE),       # calculates the sd of each group
+                 #n_PL = length(na.omit(AVAL)),      # calculates the sample size per group
+                 SE_PL = sd(AVAL, na.rm=TRUE)/sqrt(length(na.omit(AVAL))), # SE of each group
+                 low = mean(AVAL, na.rm=T) - qt(.975, length(na.omit(AVAL))-1)*2*(sd(AVAL, na.rm=T)/ length(na.omit(AVAL))^.5),
+                 upp = mean(AVAL, na.rm=T) + qt(.975, length(na.omit(AVAL))-1)*2*(sd(AVAL, na.rm=T)/ length(na.omit(AVAL))^.5),
+                 median=median(AVAL, na.rm=T) ,
+                 min = min(AVAL, na.rm=T),
+                 max = max(AVAL, na.rm=T) ,
+                 miss = sum(is.na(AVAL)) 
+      )
+    
+    
+    L$AVAL <- log(L$AVAL)
+    df_sumstat2 <- L %>% # the names of the new data frame and the data frame to be summarised
+      group_by( BASE, TRTP) %>%                      # the grouping variable
+      summarise( Ns=length(TRTP),                    
+                 mean_PL = mean(AVAL, na.rm=TRUE),   # calculates the mean of each group
+                 SE_PL = sd(AVAL, na.rm=TRUE)/sqrt(length(na.omit(AVAL))), # SE of each group
+                 sd_PL = sd(AVAL, na.rm=TRUE),       # calculates the sd of each group
+                 min = min(AVAL, na.rm=T),
+                 median=median(AVAL, na.rm=T) ,
+                 max = max(AVAL, na.rm=T) ,
+                 miss = sum(is.na(AVAL)) 
+      )
+    df_sumstat2 <- as.data.frame(df_sumstat2)
+    
+    names(df_sumstat2) <- c("Timepoint","Trt","N","Mean","SE","SD","Minimum","Median","Maximum","Missing")
+    
+   ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    trt.effx <- Norm.2.logN()$trt.eff.1  
+    
+    ss <- reshape::melt(ss[c("Timepoint","Trt","Mean")])
+    
+    A.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "A" , "value"]
+    B.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "B" , "value"]
+    A.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "A" , "value"]
+    B.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "B" , "value"]
+    
+    Y.DIFF <- B.AVAL - A.AVAL
+    word <- ifelse(Y.DIFF > 0 , "higher","lower")
+    
+    B.DIFF <- B.BASE - A.BASE
+    word2 <- ifelse(B.DIFF > 0 , "higher","lower")
+    
+    
+    cat(paste0("On the log scale, on average, the patients treated in arm B were ", p3(Y.DIFF),  " units ",word, " than the patients under treatment A, \nthat is y= ", 
+               p3(B.AVAL)," under treatment B and y= ", p3(A.AVAL), " for treatment A."))
+    
+    cat(paste0("\nBut the two groups differed in their pre treatment version of the predictor, the patients treated in arm B were ", 
+               p3(B.DIFF),  " units ",word2, " \nthan the patients under treatment A, that is y= ", p3(B.BASE)," under treatment B and y= ", p3(A.BASE), " for treatment A."))
+    
+    cat(paste0("\nAfter adjusting for this difference we obtained an estimated treatment effect B-A of ", p3(trt.effx[1] [[1]])," units."))
+    
+ 
+    
+   ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+    
+    
     # log the values
     foo2$AVAL <- log(foo2$AVAL)
     foo2$BASE <- log(foo2$BASE)
@@ -129,7 +201,35 @@ p0 <- function(x) {formatC(x, format="f", digits=0)}
     #exponentiate
     res2 <- exp(res)
     
- 
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    
+    ss <- reshape::melt(df_sumstat2[c("Timepoint","Trt","Mean")])
+    
+    A.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "A" , "value"]
+    B.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "B" , "value"]
+    A.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "A" , "value"]
+    B.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "B" , "value"]
+    
+    Y.DIFF <- B.AVAL - A.AVAL
+    word <- ifelse(Y.DIFF > 0 , "higher","lower")
+    
+    B.DIFF <- B.AVAL - A.AVAL
+    word2 <- ifelse(B.DIFF > 0 , "higher","lower")
+    
+    
+    s1<-    paste("On the log scale, on average, the patients treated in arm B were ", p2(Y.DIFF),  " units ",word, " 
+    than the patients under treatment A, that is y= ", p2(B.AVAL)," under treatment B and y= ", p2(A.AVAL), " for treatment A.")
+    
+    s2<-   paste("But the two groups differed in their pre treatment version of the predictor
+    , the patients treated in arm B were", p2(B.DIFF),  " units ",word2, " 
+    than the patients under treatment A, that is y= ", p2(B.BASE)," under treatment B and y= ", p2(A.BASE), " for treatment A.")
+    
+    s3 <- paste("Afer adjusting for this difference we obtained an estimated treatment effect B-A of ", 
+                p3(trt.eff.1[1] [[1]])," units.")
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
   
 
   
