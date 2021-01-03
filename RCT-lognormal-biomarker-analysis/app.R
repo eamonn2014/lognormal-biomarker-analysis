@@ -172,6 +172,7 @@ ui <- fluidPage(
                                  verbatimTextOutput("summary99") ,
                                  p('A reminder of the true population parameters for comparison'), 
                                  verbatimTextOutput("summary999") ,
+                          p("Summarise the analysis."), # Andrew Gelman page 11, regression and other stories 2020
                                  verbatimTextOutput("statement") ,
                           p("Comparing distributions on the log transformed sale. Let's look at shifts in quantiles."), 
                           verbatimTextOutput("statement2") ,
