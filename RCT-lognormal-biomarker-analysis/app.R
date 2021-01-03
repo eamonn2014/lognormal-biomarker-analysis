@@ -172,7 +172,10 @@ ui <- fluidPage(
                                  verbatimTextOutput("summary99") ,
                                  p('A reminder of the true population parameters for comparison'), 
                                  verbatimTextOutput("summary999") ,
-                                 verbatimTextOutput("statement") 
+                                 verbatimTextOutput("statement") ,
+                          p("Comparing distributions. Let's look at shifts in quantiles."), 
+                          verbatimTextOutput("statement2") ,
+                          verbatimTextOutput("statement3") ,
                         ),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                          tabPanel( div(h4(tags$span(style="color:black", "Adjusted means"))),
@@ -385,20 +388,6 @@ server <- shinyServer(function(input, output) {
           
           
           #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~# 
-          # lets pull out the stats and write a statement
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
           #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
           
         # log the values
@@ -847,6 +836,8 @@ server <- shinyServer(function(input, output) {
 
     output$statement <-  renderPrint({
       
+      std <- simulate()$d  # residual from model
+      
       ss <- logN.2.Norm()$df_sumstat2 # summary stats
       
       trt.effx <- Norm.2.logN()$trt.eff.1  
@@ -864,8 +855,6 @@ server <- shinyServer(function(input, output) {
       B.DIFF <- B.BASE - A.BASE
       word2 <- ifelse(B.DIFF > 0 , "higher","lower")
   
-      
- 
       cat(paste0("On the log scale, on average, the patients treated in arm B were ", p3(abs(Y.DIFF)),  " units ",word, " than the patients under treatment A, \nthat is y mean = ", 
                  p3(B.AVAL)," under treatment B and y mean = ", p3(A.AVAL), " for treatment A."))
       
@@ -878,9 +867,124 @@ server <- shinyServer(function(input, output) {
       cat(paste0("\nAlways adjust for strong baseline prognostic factors, explain easily explainable outcome variation using ANCOVA, and never use change from baseline."))
       
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ### on the un transformed scale
+      # on the un transformed scale
+      
+      
+      # cat(paste0("\nThe treatment effect was estimated at",p3(trt.effx[1] [[1]]),". We are assume the responses under the control group A
+      #            follow a normal distribution, and suppose that under the treatment B, the responses change by" ,
+      #            p3(trt.effx[1] [[1]]),". Take a person at the median of the distribution , with a response of ",23,
+      #            " under the control A
+      #            "))
+    }) 
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    
+    # see andrew gelman regression and other stories 2019 p45 comparing distributions 
+    
+    output$statement2 <-  renderPrint({
+      
+      std <-  as.numeric(Norm.2.logN()$resid)  # residual from model
+      
+      ss <- logN.2.Norm()$df_sumstat2 # summary stats
+      
+      trt.effx <- as.numeric(Norm.2.logN()$trt.eff.1[1][[1]] ) 
+      
+      ss <- reshape::melt(ss[c("Timepoint","Trt","Mean")])
+      
+      A.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "A" , "value"]
+      B.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "B" , "value"]
+      A.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "A" , "value"]
+      B.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "B" , "value"]
+      
+      Y.DIFF <- B.AVAL - A.AVAL
+      word <- ifelse(Y.DIFF > 0 , "higher","lower")
+      
+      B.DIFF <- B.BASE - A.BASE
+      word2 <- ifelse(B.DIFF > 0 , "higher","lower")
+    
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      # on the transformed scale
+       # the quantiles of a lognormal are just the quantiles of the corresponding normal exponentiated
+      new.perc <- p0((pnorm(c(A.BASE, trt.effx + A.BASE), A.BASE, std)[2])*100)
+      word3 <- "th"
+      
+      cat(paste0("The treatment effect was estimated at ",p3(trt.effx),". We assume the responses under the control group A follow a normal distribution. 
+Suppose that under the treatment B, the responses are " , p3(trt.effx)," ", word,". 
+Take a person at the median of the distribution, with a response of ",p3(A.BASE)," under the control A and so an expected response of ", p3(trt.effx + A.BASE)," under treatment B. 
+This corresponds to a shift from the 50th to the ", new.perc,"",word3," percentile of the distribution."
+                 ))
+  
+    
+  
+    }) 
+    
+    
+    
+    output$statement3 <-  renderPrint({
+      
+      std <-  as.numeric(Norm.2.logN()$resid)  # residual from model
+      
+      ss <- logN.2.Norm()$df_sumstat2 # summary stats
+      
+      trt.effx <- as.numeric(Norm.2.logN()$trt.eff.1[1][[1]] ) 
+      
+      ss <- reshape::melt(ss[c("Timepoint","Trt","Mean")])
+      
+      A.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "A" , "value"]
+      B.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "B" , "value"]
+      A.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "A" , "value"]
+      B.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "B" , "value"]
+      
+      Y.DIFF <- B.AVAL - A.AVAL
+      word <- ifelse(Y.DIFF > 0 , "higher","lower")
+      
+      B.DIFF <- B.BASE - A.BASE
+      word2 <- ifelse(B.DIFF > 0 , "higher","lower")
+      
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      # on the transformed scale
+      # the quantiles of a lognormal are just the quantiles of the corresponding normal exponentiated
+      new.perc <- p0((pnorm(c(A.BASE, trt.effx + A.BASE), A.BASE, std)[2])*100)
+      word3 <- "th"
+ 
+      
+      cat(paste0("The treatment effect was estimated at ",p3(exp(trt.effx)),". Suppose that under the treatment B, the responses are " , p3(exp(trt.effx))," ", word,". 
+Take a person at the median of the distribution, with a response of ",p3(exp(A.BASE))," under the control A and so an expected response of ", p3(exp(A.BASE)*exp(trt.effx ))," under treatment B. 
+This corresponds to a shift from the 50th to the ", new.perc,"",word3," percentile of the distribution."
+      ))
       
     }) 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     

@@ -442,7 +442,7 @@ p0 <- function(x) {formatC(x, format="f", digits=0)}
     
     sd <- sigma
     
-    prop.change <- input$grp1/input$grp2 # true prop change
+    prop.change <- grp1/grp2 # true prop change
     
     Po <- power.t.test(n= d/2, delta =log(prop.change), sd=sd, sig.level=0.05,
                        power=NULL, type="two.sample", alternative=c("two.sided"))
@@ -457,3 +457,4 @@ p0 <- function(x) {formatC(x, format="f", digits=0)}
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
    
+     
