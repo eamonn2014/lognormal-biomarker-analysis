@@ -173,8 +173,9 @@ ui <- fluidPage(
                                  p('A reminder of the true population parameters for comparison'), 
                                  verbatimTextOutput("summary999") ,
                                  verbatimTextOutput("statement") ,
-                          p("Comparing distributions. Let's look at shifts in quantiles."), 
+                          p("Comparing distributions on the transformed sale. Let's look at shifts in quantiles."), 
                           verbatimTextOutput("statement2") ,
+                          p("Comparing distributions on the untransformed scale. Let's look at shifts in quantiles."), 
                           verbatimTextOutput("statement3") ,
                         ),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -842,6 +843,9 @@ server <- shinyServer(function(input, output) {
       
       trt.effx <- Norm.2.logN()$trt.eff.1  
       
+      trt.effx <- (Norm.2.logN()$res)[1][[1]] #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      
+      
       ss <- reshape::melt(ss[c("Timepoint","Trt","Mean")])
       
       A.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "A" , "value"]
@@ -890,6 +894,8 @@ server <- shinyServer(function(input, output) {
       
       trt.effx <- as.numeric(Norm.2.logN()$trt.eff.1[1][[1]] ) 
       
+      trt.effx <- (Norm.2.logN()$res)[1][[1]] #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      
       ss <- reshape::melt(ss[c("Timepoint","Trt","Mean")])
       
       A.AVAL <- ss[ss$Timepoint %in% "AVAL" & ss$Trt %in% "A" , "value"]
@@ -909,9 +915,9 @@ server <- shinyServer(function(input, output) {
       new.perc <- p0((pnorm(c(A.BASE, trt.effx + A.BASE), A.BASE, std)[2])*100)
       word3 <- "th"
       
-      cat(paste0("The treatment effect was estimated at ",p3(trt.effx),". We assume the responses under the control group A follow a normal distribution. 
-Suppose that under the treatment B, the responses are " , p3(trt.effx)," ", word,". 
-Take a person at the median of the distribution, with a response of ",p3(A.BASE)," under the control A and so an expected response of ", p3(trt.effx + A.BASE)," under treatment B. 
+      cat(paste0("The treatment effect was estimated at ",p3(trt.effx),". Under the control group A the responses follow a normal distribution. 
+Under the treatment B, the responses are estimated to be " , p3(trt.effx)," ", word,". 
+Take a person at the median of the distribution, with a response of ",p3(A.BASE)," under the control A, and so we expect a response of ", p3(trt.effx + A.BASE)," under treatment B. 
 This corresponds to a shift from the 50th to the ", new.perc,"",word3," percentile of the distribution."
                  ))
   
@@ -937,7 +943,7 @@ This corresponds to a shift from the 50th to the ", new.perc,"",word3," percenti
       B.BASE <- ss[ss$Timepoint %in% "BASE" & ss$Trt %in% "B" , "value"]
       
       Y.DIFF <- B.AVAL - A.AVAL
-      word <- ifelse(Y.DIFF > 0 , "higher","lower")
+      word <- ifelse(Y.DIFF > 0 , "larger","smaller")
       
       B.DIFF <- B.BASE - A.BASE
       word2 <- ifelse(B.DIFF > 0 , "higher","lower")
@@ -946,47 +952,15 @@ This corresponds to a shift from the 50th to the ", new.perc,"",word3," percenti
       # on the transformed scale
       # the quantiles of a lognormal are just the quantiles of the corresponding normal exponentiated
       new.perc <- p0((pnorm(c(A.BASE, trt.effx + A.BASE), A.BASE, std)[2])*100)
-      word3 <- "th"
- 
-      
-      cat(paste0("The treatment effect was estimated at ",p3(exp(trt.effx)),". Suppose that under the treatment B, the responses are " , p3(exp(trt.effx))," ", word,". 
-Take a person at the median of the distribution, with a response of ",p3(exp(A.BASE))," under the control A and so an expected response of ", p3(exp(A.BASE)*exp(trt.effx ))," under treatment B. 
-This corresponds to a shift from the 50th to the ", new.perc,"",word3," percentile of the distribution."
+       
+      cat(paste0("The treatment effect was estimated at ",p3(exp(trt.effx)),". Under the treatment B, the responses are estimated to be proportionally " , p3(exp(trt.effx))," times ", word,". 
+Take a person at the median of the distribution, with a response of ",p0(exp(A.BASE))," under the control A, and so we expect a response of ", p0(exp(A.BASE)*exp(trt.effx ))," under treatment B. 
+This corresponds to a shift from the 50th to the ", new.perc,"th percentile of the distribution."
       ))
       
     }) 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     output$summary <- renderPrint({
         (Norm.2.logN()$res)
