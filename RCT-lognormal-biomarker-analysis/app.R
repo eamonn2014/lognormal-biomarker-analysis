@@ -173,7 +173,7 @@ ui <- fluidPage(
                                  p('A reminder of the true population parameters for comparison'), 
                                  verbatimTextOutput("summary999") ,
                                  verbatimTextOutput("statement") ,
-                          p("Comparing distributions on the transformed sale. Let's look at shifts in quantiles."), 
+                          p("Comparing distributions on the log transformed sale. Let's look at shifts in quantiles."), 
                           verbatimTextOutput("statement2") ,
                           p("Comparing distributions on the untransformed scale. Let's look at shifts in quantiles."), 
                           verbatimTextOutput("statement3") ,
@@ -915,8 +915,9 @@ server <- shinyServer(function(input, output) {
       new.perc <- p0((pnorm(c(A.BASE, trt.effx + A.BASE), A.BASE, std)[2])*100)
       word3 <- "th"
       
-      cat(paste0("The treatment effect was estimated at ",p3(trt.effx),". Under the control group A the responses follow a normal distribution. 
-Under the treatment B, the responses are estimated to be " , p3(trt.effx)," ", word,". 
+      cat(paste0("The treatment effect was estimated at ",p3(trt.effx)," and the ANCOVA model residual standard deviation ",p3(std),". 
+Under the control group A the responses follow a normal distribution. 
+Under the treatment B, the responses are estimated to be " , p3(trt.effx)," ", word, " compared to treatment A. 
 Take a person at the median of the distribution, with a response of ",p3(A.BASE)," under the control A, and so we expect a response of ", p3(trt.effx + A.BASE)," under treatment B. 
 This corresponds to a shift from the 50th to the ", new.perc,"",word3," percentile of the distribution."
                  ))
@@ -953,9 +954,10 @@ This corresponds to a shift from the 50th to the ", new.perc,"",word3," percenti
       # the quantiles of a lognormal are just the quantiles of the corresponding normal exponentiated
       new.perc <- p0((pnorm(c(A.BASE, trt.effx + A.BASE), A.BASE, std)[2])*100)
        
-      cat(paste0("The treatment effect was estimated at ",p3(exp(trt.effx)),". Under the treatment B, the responses are estimated to be proportionally " , p3(exp(trt.effx))," times ", word,". 
+      cat(paste0("The treatment effect was estimated at ",p3(exp(trt.effx)),". Under the treatment B, the responses are estimated to be proportionally " , p3(exp(trt.effx))," times ", word," than treatment A.
 Take a person at the median of the distribution, with a response of ",p0(exp(A.BASE))," under the control A, and so we expect a response of ", p0(exp(A.BASE)*exp(trt.effx ))," under treatment B. 
-This corresponds to a shift from the 50th to the ", new.perc,"th percentile of the distribution."
+This corresponds to a shift from the 50th to the ", new.perc,"th percentile of the distribution. 
+Note, the quantiles of a lognormal are just the quantiles of the corresponding normal exponentiated."
       ))
       
     }) 
