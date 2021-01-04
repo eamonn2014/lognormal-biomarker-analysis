@@ -1025,7 +1025,7 @@ Note, the quantiles of a lognormal are just the quantiles of the corresponding n
      })
      
      output$sum_stat2 <- renderPrint({
-       print(logN.2.Norm()$df_sumstat2, digits=2) 
+       print(logN.2.Norm()$df_sumstat2, digits=4) 
      })
      
 
