@@ -455,6 +455,17 @@ p0 <- function(x) {formatC(x, format="f", digits=0)}
  
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-   
+  # quick check on statement I make
+  # moving from median on transformed and untransformed scales
+     set.seed(123)
+     n <- 9
+     x<-rlnorm(n)
+     x<- sort(x)
+     lx <- log(x)
+     
+     
+     x
+     lx
+     summary(x)
+     summary(lx)
      
