@@ -174,9 +174,11 @@ ui <- fluidPage(
                                  verbatimTextOutput("summary999") ,
                           p("Summarise the analysis."), # Andrew Gelman page 11, regression and other stories 2020
                                  verbatimTextOutput("statement") ,
-                          p("Comparing distributions on the log transformed sale. Let's look at shifts in quantiles."), 
+                          p("Comparing distributions on the log transformed sale. Looking at shifts in quantiles may give some context to an estimated treatment effect, 
+                            a number that could otherwise be hard to interpret on its own"), 
                           verbatimTextOutput("statement2") ,
-                          p("Comparing distributions on the untransformed scale. Let's look at shifts in quantiles."), 
+                          p("Comparing distributions on the untransformed sale. Looking at shifts in quantiles may give some context to an estimated treatment effect, 
+                            a number that could otherwise be hard to interpret on its own"), 
                           verbatimTextOutput("statement3") ,
                         ),
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
