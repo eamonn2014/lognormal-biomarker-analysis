@@ -168,7 +168,13 @@ ui <- fluidPage(
                           h3("Estimate the treatment effect using ANCOVA model"),
                                  p('This is the result of interest, the difference B-A on the log scale with 95% confidence.'), 
                                  verbatimTextOutput("summary") ,
-                                 p('The log scale is not very intuitive so we back transform and present below. This is the result of interest, on the more relevant original scale, the proportional change adjusted for baseline with 95% confidence (this is the ratio of adjusted geometric means (B/A))'), 
+                                 p('The log scale is not very intuitive so we back transform and present below. This is the result of interest, on the more relevant original scale, the proportional change adjusted for baseline with 95% confidence (this is the ratio of adjusted geometric means (B/A)).
+                                   The original data were skewed so it is no surprise the CI is skewed in the same direction to provide accurate coverage in both tails. 
+Note, the log of a mean is not the mean of a log. So we are not estimating a mean on the transformed scale.
+If the transformed scale has a symmetric distribution especially a normal 
+distribution, when we antilog we are estimating the median on the transformed scale, 
+the median of a log is the log of a median. The median and all the quantiles are transformation invariant.
+'), 
                                  verbatimTextOutput("summary99") ,
                                  p('A reminder of the true population parameters for comparison'), 
                                  verbatimTextOutput("summary999") ,
@@ -1025,7 +1031,7 @@ Note, the quantiles of a lognormal are just the quantiles of the corresponding n
      })
      
      output$sum_stat2 <- renderPrint({
-       print(logN.2.Norm()$df_sumstat2, digits=2) 
+       print(logN.2.Norm()$df_sumstat2, digits=4) 
      })
      
 
